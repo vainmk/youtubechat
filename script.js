@@ -1,5 +1,9 @@
 const chatContainer = document.getElementById('chat-container');
 
+// Replace with your own YouTube channel ID and API key
+const channelId = 'UCYRn-QqUqTpOVo8DxeI6SwA';
+const apiKey = 'AIzaSyDn3_OQqdSpsbdjvvKMIcABCJESpdnO1qw';
+
 // Function to generate a random position within the bounds of the container
 function getRandomPosition() {
     const containerWidth = chatContainer.offsetWidth;
@@ -29,5 +33,25 @@ function addChatMessage(message) {
     }, 5000); // Match this with the CSS animation duration
 }
 
-// Test chat message (for testing purposes)
-addChatMessage("Test message");
+// Function to fetch live chat messages from YouTube
+async function fetchChatMessages() {
+    try {
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/liveChat/messages?part=snippet,authorDetails&liveChatId=${channelId}&key=${apiKey}`);
+        const data = await response.json();
+
+        if (data.items && data.items.length > 0) {
+            data.items.forEach(item => {
+                const message = item.snippet.displayMessage;
+                addChatMessage(message);
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching chat messages:', error);
+    }
+}
+
+// Poll for new messages every 5 seconds
+setInterval(fetchChatMessages, 5000);
+
+// Initial call to display existing messages
+fetchChatMessages();

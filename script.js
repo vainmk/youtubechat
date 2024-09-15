@@ -33,25 +33,30 @@ function addChatMessage(message) {
     }, 5000); // Match this with the CSS animation duration
 }
 
-// Function to fetch live chat messages from YouTube
 async function fetchChatMessages() {
+    console.log('Fetching chat messages');
     try {
         const response = await fetch(`https://www.googleapis.com/youtube/v3/liveChat/messages?part=snippet,authorDetails&liveChatId=${channelId}&key=${apiKey}`);
         const data = await response.json();
-
+        console.log(data); // Log the response
         if (data.items && data.items.length > 0) {
             data.items.forEach(item => {
                 const message = item.snippet.displayMessage;
                 addChatMessage(message);
             });
+        } else {
+            console.log('No chat messages found.');
         }
     } catch (error) {
         console.error('Error fetching chat messages:', error);
     }
 }
 
+
 // Poll for new messages every 5 seconds
 setInterval(fetchChatMessages, 5000);
 
 // Initial call to display existing messages
 fetchChatMessages();
+
+console.log('Script loaded');
